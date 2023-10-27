@@ -15,8 +15,6 @@ const url = "https://www.course-api.com/react-useReducer-cart-project";
 
 const AppContext = createContext();
 
-
-
 export const useGlobalContext = () => useContext(AppContext);
 
 const initialState = {
@@ -26,20 +24,24 @@ const initialState = {
 export const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  //  fetch data from api
   const fetchCart = async () => {
-    dispatch({type:LOADING})
-    const resp = await fetch(url)
+    // dispatch loading to reducer
+    dispatch({ type: LOADING });
+    const resp = await fetch(url);
     if (!resp.ok) {
-      throw new Error('invalid url')
-      return
-    } 
-    const response = await resp.json()
-    dispatch({type:DISPLAY, payload:{cart:response}})
-  }
+      throw new Error("invalid url");
+      return;
+    }
+    const response = await resp.json();
+
+    // dispatch display item to reducer so as to set the cart
+    dispatch({ type: DISPLAY, payload: { cart: response } });
+  };
 
   useEffect(() => {
-    fetchCart()
-  },[])
+    fetchCart();
+  }, []);
 
   const { totalAmount, totalCost } = getTotal(state.cart);
 
@@ -54,14 +56,23 @@ export const AppProvider = ({ children }) => {
   // increase cart
   const increase = (id) => {
     dispatch({ type: INCREASE, payload: { id } });
-    };
-    // decrese cart
+  };
+  // decrease cart
   const decrease = (id) => {
     dispatch({ type: DECREASE, payload: { id } });
   };
+
   return (
     <AppContext.Provider
-      value={{ ...state, clearCart, remove, increase, decrease, totalAmount,totalCost}}
+      value={{
+        ...state,
+        clearCart,
+        remove,
+        increase,
+        decrease,
+        totalAmount,
+        totalCost,
+      }}
     >
       {children}
     </AppContext.Provider>
